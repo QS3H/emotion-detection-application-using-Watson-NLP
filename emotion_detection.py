@@ -1,4 +1,5 @@
-import requests  
+import requests
+import json
 
 def emotion_detector(text_to_analyze):
     # Function to analyze emotions in text using Watson NLP Emotion Predict
@@ -14,7 +15,35 @@ def emotion_detector(text_to_analyze):
     
     response = requests.post(url, headers=headers, json=input_json)
     
-    if response.status_code == 200:
-        return response.text  
-    else:
-        return None  
+    # Convert response text to dictionary
+    response_dict = json.loads(response.text)
+    
+    # Extract emotion scores
+    emotion_scores = response_dict['emotionPredictions'][0]['emotion']
+    
+    anger_score = emotion_scores['anger']
+    disgust_score = emotion_scores['disgust']
+    fear_score = emotion_scores['fear']
+    joy_score = emotion_scores['joy']
+    sadness_score = emotion_scores['sadness']
+    
+    # Find dominant emotion
+    emotions = {
+        'anger': anger_score,
+        'disgust': disgust_score,
+        'fear': fear_score,
+        'joy': joy_score,
+        'sadness': sadness_score
+    }
+    
+    dominant_emotion = max(emotions, key=emotions.get)
+    
+    # Return the required format
+    return {
+        'anger': anger_score,
+        'disgust': disgust_score,
+        'fear': fear_score,
+        'joy': joy_score,
+        'sadness': sadness_score,
+        'dominant_emotion': dominant_emotion
+    }
